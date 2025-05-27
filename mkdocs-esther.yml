@@ -1,0 +1,13 @@
+site_name: Exercícios de Microserviços - 2025.1  
+nav:
+  - Início: index.md
+  - Roteiro 1 - Exchange: roteiro1.md
+  - Roteiro 2: roteiro2.md
+  - Roteiro 3: roteiro3.md
+  - Roteiro 4: roteiro4.md
+  - Projeto: projeto.md
+  - Diagramas: diagramas.md
+theme:
+  name: material
+plugins:
+  - search
