@@ -1,20 +1,24 @@
 pipeline {
     agent any
+
     environment {
         SERVICE = 'product'
         NAME = "esthercaroline/${env.SERVICE}"
     }
+
     stages {
-        stage('Dependecies') {
+        stage('Dependencies') {
             steps {
                 build job: 'product', wait: true
             }
         }
+
         stage('Build') { 
             steps {
                 sh 'mvn -B -DskipTests clean package'
             }
-        }      
+        }
+
         stage('Build & Push Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credential', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
@@ -25,16 +29,26 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy') {
             steps {
-                
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                withCredentials([
+                    usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'),
+                    file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')
+                ]) {
                     sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                         export KUBECONFIG=$KUBECONFIG_FILE
+
+                        # Atualiza o token para o EKS
+                        aws eks get-token --region us-east-2 --cluster-name eks-store > /dev/null
+
+                        # Aplica os manifests
                         kubectl apply -f k8s/k8s.yaml
                     '''
-                    sh 'kubectl apply -f postgres.yaml'
+                }
+            }
         }
     }
-}
 }
