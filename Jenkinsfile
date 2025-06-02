@@ -25,10 +25,16 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') { 
+        stage('Deploy') {
             steps {
-                sh 'kubectl apply -f k8s/k8s.yaml'
-            }
+                
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                    sh '''
+                        export KUBECONFIG=$KUBECONFIG_FILE
+                        kubectl apply -f k8s/k8s.yaml
+                    '''
+                    sh 'kubectl apply -f postgres.yaml'
         }
     }
+}
 }
