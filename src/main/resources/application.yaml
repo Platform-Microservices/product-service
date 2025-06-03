@@ -20,7 +20,7 @@ spring:
   flyway:
     schemas: product
     baseline-on-migrate: true
-  
+
   data:
     redis:
       host: ${REDIS_HOST:redis}
@@ -30,11 +30,11 @@ spring:
     type: redis
 
 management:
-endpoint:
+  endpoint:
     gateway:
-    enabled: true
-endpoints:
+      enabled: true
+  endpoints:
     web:
-    base-path: /gateway/actuator
-    exposure:
-        include: [ 'prometheus', 'gateway' ]    
+      base-path: /gateway/actuator
+      exposure:
+        include: [ 'prometheus', 'gateway' ]
